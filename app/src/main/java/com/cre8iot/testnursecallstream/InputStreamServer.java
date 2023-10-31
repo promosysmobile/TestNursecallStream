@@ -17,8 +17,15 @@ import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InputStreamServer {
     private static final int frequency = 44100;
@@ -32,16 +39,17 @@ public class InputStreamServer {
     private Socket connfd;
 
 
-    public InputStreamServer(final Context ctx, final int port, final short myGain) {
+    public InputStreamServer(final Context ctx, final int port) {
         recBufSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
         if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
             //audioRecord = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, frequency, channelConfiguration, audioEncoding, recBufSize);
             audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency, channelConfiguration, audioEncoding, recBufSize);
-            //AcousticEchoCanceler myAcousticCanceler = AcousticEchoCanceler.create(audioRecord.getAudioSessionId());
-            //myAcousticCanceler.setEnabled(true);
+            AcousticEchoCanceler myAcousticCanceler = AcousticEchoCanceler.create(audioRecord.getAudioSessionId());
+            myAcousticCanceler.setEnabled(true);
 
             Log.i("InputStreamServer", "acousticEchoAvailable: " + AcousticEchoCanceler.isAvailable());
 
+            /*
             AudioManager audioManager = (AudioManager) ctx.getSystemService(AUDIO_SERVICE);
             int audioSessionId = audioManager.generateAudioSessionId();
             //int audioSessionId = audioRecord.getAudioSessionId();
@@ -58,6 +66,7 @@ public class InputStreamServer {
             }
             Log.i("InputStreamServer", "gainLevel: " + gainLevel);
             equalizer.setBandLevel(bandIndex, gainLevel);
+            */
 
             try {
                 //open tcp server
@@ -69,6 +78,26 @@ public class InputStreamServer {
                 ctx.sendBroadcast(intent);
                 return;
             }
+
+            /*
+            String filePath = "/storage/emulated/0/Download/EzycallDesktop/test_mp32.txt"; // Replace this with the actual file path
+            StringBuilder content = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    content.append(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String hexString = content.toString().trim();
+
+            if (hexString.length() % 2 != 0) {
+                throw new IllegalArgumentException("Hex string must have an even number of characters");
+            }
+            List<Byte> byteList = new ArrayList<>();
+            */
 
             new Thread() {
                 final byte[] buffer = new byte[recBufSize];
@@ -90,24 +119,49 @@ public class InputStreamServer {
                         isRecording = false;
                         return;
                     }
+
+
+                    try {
+                        sleep(2000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     audioRecord.startRecording();
                     isRecording = true;
+                    boolean isSendStreamAudio = true;
 
                     while (isRecording) {
-                        if(connfd.isConnected()){
-                            int readSize = audioRecord.read(buffer, 0, recBufSize);
-                            try {
-                                connfd.getOutputStream().write(buffer, 0, readSize);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Intent intent = new Intent().setAction("inputServerStream.ERROR").putExtra("msg", e.toString());
-                                ctx.sendBroadcast(intent);
-                                break;
-                            }
-                        }else{
-                            isRecording = false;
-                        }
+                        /*
+                        if(isSendStreamAudio){
+                            for (int i = 0; i < hexString.length(); i += 2) {
+                                String hexByte = hexString.substring(i, i + 2);
+                                byte byteValue = (byte) Integer.parseInt(hexByte, 16);
+                                byteList.add(byteValue);
 
+                                if (byteList.size() > recBufSize - 1) {
+                                    for (int b = 0; b < byteList.size(); b++) {
+                                        buffer[b] = byteList.get(b);
+                                    }
+                                    byteList.clear();
+                                    try {
+                                        connfd.getOutputStream().write(buffer);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                            isSendStreamAudio = false;
+                            audioRecord.startRecording();
+                        }
+                        */
+                        int readSize = audioRecord.read(buffer, 0, recBufSize);
+                        try {
+                            connfd.getOutputStream().write(buffer, 0, readSize);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Intent intent = new Intent().setAction("inputServerStream.ERROR").putExtra("msg", e.toString());
+                            break;
+                        }
                     }
                     audioRecord.stop();
                     audioRecord.release();
@@ -120,6 +174,10 @@ public class InputStreamServer {
                 }
             }.start();
         }
+    }
+
+    private void getFiles(){
+
     }
 
     public void stop() {

@@ -48,41 +48,14 @@ public class OutputStreamServer {
         //audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, frequency, channelConfiguration, MediaRecorder.AudioEncoder.AMR_NB, playBufSize, AudioTrack.MODE_STREAM);
 
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency, channelConfiguration, audioEncoding, playBufSize, AudioTrack.MODE_STREAM);
-        Log.i("OutputStreamServer", "acousticEchoAvailable: " + AcousticEchoCanceler.isAvailable());
-        //audioTrack.setVolume(1f);
-
-        //NoiseSuppressor.create(audioTrack.getAudioSessionId());
-        //Log.i("OutputStreamServer","enhancer: " + enhancer.getTargetGain());
-
-        AudioManager audioManager = (AudioManager) ctx.getSystemService(AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.MODE_IN_CALL);
-        audioManager.setSpeakerphoneOn(true);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
-        //int audioSessionId = audioManager.generateAudioSessionId();
-        Equalizer equalizer = new Equalizer(0, audioTrack.getAudioSessionId());
-        Log.i("OutputStreamServer", "audioSessionId: " + audioTrack.getAudioSessionId());
-        equalizer.setEnabled(true);
-        short bandIndex = 0;
-        short gainLevel = 1500;
-
+        /*
         enhancer = new LoudnessEnhancer(audioTrack.getAudioSessionId());
-        //enhancer = new LoudnessEnhancer(audioSessionId);
-        //audioTrack.setStereoVolume(1f, 1f);
         audioTrack.setVolume(1f);
         enhancer.setTargetGain(1000);
         enhancer.setEnabled(true);
-        Log.i("OutputStreamServer", "enhancer.getTargetGain: " + enhancer.getTargetGain());
 
         AcousticEchoCanceler.create(audioTrack.getAudioSessionId());
-        //AcousticEchoCanceler.create(audioSessionId);
-
-        if (gainLevel < equalizer.getBandLevelRange()[0]) {
-            gainLevel = equalizer.getBandLevelRange()[0];
-        } else if (gainLevel > equalizer.getBandLevelRange()[1]) {
-            gainLevel = equalizer.getBandLevelRange()[1];
-        }
-        Log.i("OutputStreamServer", "gainLevel: " + gainLevel);
-        equalizer.setBandLevel(bandIndex, gainLevel);
+        */
 
         try {
             //open tcp server
@@ -114,13 +87,13 @@ public class OutputStreamServer {
                     isPlaying = false;
                     return;
                 }
-                audioTrack.play();
+                //audioTrack.play();
                 isPlaying = true;
                 while (isPlaying) {
                     int readSize = 0;
 
                     try {
-                        buffer = new byte[connfd.getInputStream().available()];
+                        //buffer = new byte[connfd.getInputStream().available()];
                         readSize = connfd.getInputStream().read(buffer);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -128,12 +101,12 @@ public class OutputStreamServer {
                         ctx.sendBroadcast(intent);
                         break;
                     }
-                    audioTrack.write(buffer, 0, readSize);
-                    audioTrack.flush();
+                    //audioTrack.write(buffer, 0, readSize);
+                    //audioTrack.flush();
 
                 }
-                audioTrack.stop();
-                audioTrack.release();
+                //audioTrack.stop();
+                //audioTrack.release();
                 try {
                     connfd.close();
                 }
@@ -149,7 +122,7 @@ public class OutputStreamServer {
         isPlaying = false;
         try {
             sockfd.close();
-            enhancer.release();
+            //enhancer.release();
         }
         catch (Exception e) { e.printStackTrace(); }
     }

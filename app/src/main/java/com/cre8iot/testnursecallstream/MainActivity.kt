@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.media.audiofx.Equalizer
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
@@ -141,9 +142,26 @@ class MainActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListener
                 intOutputPort = binding.edtOutputServerPort.text.toString().toInt()
                 intInputPort = Integer.valueOf(binding.edtInputServer.getText().toString())
 
-                val gainLevel: Short = binding.edtGainValue.text.toString().toShort()
+                val edtGainLevel: Short = binding.edtGainValue.text.toString().toShort()
+                val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+                val audioSessionId = audioManager.generateAudioSessionId()
+                val equalizer = Equalizer(0, audioSessionId)
+                Log.i("InputStreamServer", "audioSessionId: $audioSessionId")
+                equalizer.enabled = true
+                val bandIndex: Short = 0
+                var gainLevel: Short = edtGainLevel
+
+                if (gainLevel < equalizer.bandLevelRange[0]) {
+                    gainLevel = equalizer.bandLevelRange[0]
+                } else if (gainLevel > equalizer.bandLevelRange[1]) {
+                    gainLevel = equalizer.bandLevelRange[1]
+                }
+                equalizer.setBandLevel(bandIndex, gainLevel)
+
+                Log.i("MainActivity", "bandLevels: ${equalizer.properties.bandLevels}")
+
                 outputStreamServer = OutputStreamServer(applicationContext, intOutputPort)
-                inputStreamServer = InputStreamServer(applicationContext, intInputPort, gainLevel)
+                inputStreamServer = InputStreamServer(applicationContext, intInputPort)
 
                 /*
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -174,10 +192,10 @@ class MainActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListener
 
 
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-        //audioManager.mode = AudioManager.MODE_IN_CALL
+        audioManager.mode = AudioManager.MODE_IN_CALL
         //audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-        //audioManager.isSpeakerphoneOn = true
-        //audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
+        audioManager.isSpeakerphoneOn = true
+        audioManager.adjustStreamVolume(AudioManager.MODE_IN_CALL, AudioManager.ADJUST_RAISE, 0);
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -211,7 +229,7 @@ class MainActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListener
 
     private fun checkPermissions(): Boolean {
         val result = ContextCompat.checkSelfPermission(applicationContext,
-            Manifest.permission.RECORD_AUDIO
+            Manifest.permission.READ_EXTERNAL_STORAGE
         )
         return result == PackageManager.PERMISSION_GRANTED
     }
@@ -219,7 +237,7 @@ class MainActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListener
     private fun requestPermissions() {
         ActivityCompat.requestPermissions(
             this@MainActivity,
-            arrayOf(Manifest.permission.RECORD_AUDIO),
+            arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE),
             1
         )
     }
