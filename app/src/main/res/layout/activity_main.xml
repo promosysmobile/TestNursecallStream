@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:padding="10dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="MY IP: "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/txt_server_IP"
+                    android:layout_marginStart="20dp"
+                    android:textSize="19sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_ready"
+                android:text="START"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:textSize="22sp"
+                android:text="Playback Audio (Output Port)"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="PORT: "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <EditText
+                    android:singleLine="true"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:id="@+id/edt_output_server_port"
+                    android:layout_marginStart="20dp"
+                    android:text="5050"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:textSize="22sp"
+                android:text="Record Audio (Input Port)"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="PORT: "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <EditText
+                    android:singleLine="true"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:id="@+id/edt_input_server"
+                    android:layout_marginStart="20dp"
+                    android:text="5000"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:textSize="22sp"
+                android:text="Set Gain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="GAIN: "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <EditText
+                    android:singleLine="true"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:id="@+id/edt_gain_value"
+                    android:layout_marginStart="20dp"
+                    android:text="1000"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            <TextView
+                android:layout_marginTop="30dp"
+                android:textSize="22sp"
+                android:text="Client"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
+            <ScrollView
+                android:layout_marginTop="20dp"
+                android:background="@color/black"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical|horizontal">
+                <TextView
+                    android:textColor="@color/white"
+                    android:id="@+id/textView1"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:textSize="16sp"
+                    />
+            </ScrollView>
+
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </ScrollView>
+
+
+</layout>
+
